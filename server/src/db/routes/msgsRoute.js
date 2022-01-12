@@ -4,13 +4,30 @@ import { v4 } from "uuid";
 import { readDB, writeDB } from "./../../dbController.js";
 // 핸들러의 내용 구현하기
 const msgsRoute = [
+    //Get ALL messages
+ //GET msgs, get은 url 접근으로도 바로 확인가능
   {
-    //GET msgs, get은 url 접근으로도 바로 확인가능
     method: "get",
     route: "/messages",
     handler: (req, res) => {
       const msgs = readDB("msgs");
       res.send(msgs);
+    },
+  },
+  // get 1 message
+  {
+    method: "get",
+    route: "/messages/:id",
+    // id 가져오면 error /edge case 넣기
+    handler: ({params:{id}}, res) => {
+        // 404 찾지 못함
+        try{
+            const msgs = readDB("msgs");
+            const targetMsg = msgs.find(msg =>msg.id === id); // msg.id 는 db, 그냥 id는 params.id 임
+            if(!targetMsg) throw Error("Message not found");
+            res.send(targetMsg);
+            
+        }catch(err){res.status(404).send({error:err})}
     },
   },
   {
